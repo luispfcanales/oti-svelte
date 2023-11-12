@@ -1,6 +1,8 @@
 <script>
   import {link} from "svelte-spa-router"
+  import Background from "../lib/Background.svelte";
 </script>
+<Background vh={true}/>
 <div class="flex items-center pt-8 md:pt-0 h-screen overflow-hidden">
   <div class="w-full md:w-7/12 px-16 flex flex-col gap-3">
     <div class="w-full h-16">

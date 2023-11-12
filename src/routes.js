@@ -1,9 +1,22 @@
+import {wrap} from 'svelte-spa-router/wrap'
 import Login from "./routes/Login.svelte"
-import Home from "./routes/Home.svelte"
-import Page from "./routes/admin/Page.svelte"
-const routes = {
-  "/":Home,
-  "/login":Login,
-  "/admin":Page,
+import InformationApp from "./routes/InformationApp.svelte"
+import AdminRoute from "./routes/admin/AdminRoute.svelte"
+
+const isAuthenticated = () => {
+  return true
 }
+
+const routes = {
+  '/':InformationApp,
+  '/login':Login,
+  '/admin':wrap({
+    component:AdminRoute,
+    conditions:[
+      ()=>isAuthenticated(),
+    ],
+  }),
+  '/admin/*':AdminRoute,
+}
+
 export default routes;
