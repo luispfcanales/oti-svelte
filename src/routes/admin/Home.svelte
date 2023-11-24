@@ -13,7 +13,7 @@
         <Ticket></Ticket>
       {/each}
     </section>
-    <section>
+    <section class="w-full overflow-x-auto">
     <TableGrid/>
     </section>
   </svelte:fragment>
