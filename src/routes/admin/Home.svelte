@@ -12,5 +12,7 @@
         <Ticket></Ticket>
       {/each}
     </section>
+    <section>
+    </section>
   </svelte:fragment>
 </Layout>

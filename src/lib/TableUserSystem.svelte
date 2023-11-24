@@ -13,16 +13,48 @@
 
     Pagination,
 
+    Badge,
   } from 'flowbite-svelte';
-  import {DotsHorizontalOutline } from 'flowbite-svelte-icons';
+
+  import {
+    DotsHorizontalOutline,
+    ChevronLeftOutline,
+    ChevronRightOutline
+  } from 'flowbite-svelte-icons';
 
   export let items = [];
   export let fnOpenModalDelete;
 
-  let searchTerm = '';
-  let helper = { start: 1, end: 10, total: 100 };
+  let pages = [];
 
-  $: filteredItems = items.filter((item) => item.fullname.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1);
+  let searchDataTable = '';
+  let limitToRenderTable = 10
+
+  //reactive search filter
+  $: filteredItems = items.filter((item) => item.fullname.toLowerCase().indexOf(searchDataTable.toLowerCase()) !== -1);
+  $: sizeFilterItems = filteredItems.length
+
+  //reactive pagination
+  let pagSize
+  function getButtonPagination(index) {
+    let listPagination = []
+    for(let i=1;i<=index;i++){
+      listPagination.push({ name :`${i}`,active:false})
+    }
+    listPagination[0].active = true
+    return  listPagination
+  }
+  $:{
+    if(sizeFilterItems > 0){
+      pagSize = filteredItems.length / limitToRenderTable;
+      pagSize = Math.ceil(pagSize);
+      pages = getButtonPagination(pagSize)
+    }else{
+      pagSize = 0;
+    }
+    console.log("debbug pagination: "+pagSize)
+  }
+
 </script>
 
 <section>
@@ -30,7 +62,7 @@
     <TableSearch 
       placeholder="Ingrese nombre" 
       hoverable={true} 
-      bind:inputValue={searchTerm} 
+      bind:inputValue={searchDataTable} 
       divClass="mx-4 mt-5 shadow-md bg-rose-400 rounded-md"
     >
       <TableHead >
@@ -44,20 +76,26 @@
         <TableHeadCell>Opciones</TableHeadCell>
       </TableHead>
       <TableBody>
-        {#each filteredItems as item , numberIndex}
+        {#each Array(sizeFilterItems) as _,index (index)}
           <TableBodyRow>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{numberIndex+1}</TableBodyCell>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{item.dni}</TableBodyCell>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{item.email}</TableBodyCell>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{item.fullname}</TableBodyCell>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{item.state}</TableBodyCell>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{item.role}</TableBodyCell>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{item.staff}</TableBodyCell>
+            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{index+1}</TableBodyCell>
+            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{filteredItems[index].dni}</TableBodyCell>
+            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{filteredItems[index].email}</TableBodyCell>
+            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{filteredItems[index].fullname}</TableBodyCell>
+            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">
+              {#if filteredItems[index].state}
+                <Badge color={"green"}>Activo</Badge>
+              {:else}
+                <Badge color={"red"}>Inactivo</Badge>
+              {/if}
+            </TableBodyCell>
+            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{filteredItems[index].role}</TableBodyCell>
+            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{filteredItems[index].staff}</TableBodyCell>
             <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap flex justify-center">
               <DotsHorizontalOutline class="text-rose-400"/>
               <Dropdown>
                 <DropdownItem>Editar</DropdownItem>
-                <DropdownItem on:click={()=>{fnOpenModalDelete(item.dni)}}>
+                <DropdownItem on:click={()=>{fnOpenModalDelete(filteredItems[index].dni)}}>
                   Eliminar
                 </DropdownItem>
               </Dropdown>
@@ -65,20 +103,28 @@
           </TableBodyRow>
         {/each}
       </TableBody>
+
+      <svelte:fragment slot="footer">
+        {#if sizeFilterItems == 0}
+          <h1 class="font-medium text-center p-4 bg-slate-500 rounded text-white">
+            No se encontraron resultados!
+          </h1>
+        {/if}
+      </svelte:fragment>
+
     </TableSearch>
   </Table>
-  <div class="flex flex-col items-center justify-center gap-2 mt-4">
-    <div class="text-sm text-gray-700 dark:text-gray-400">
-      Showing <span class="font-semibold text-gray-900 text-white">{helper.start}</span>
-      to
-      <span class="font-semibold text-gray-900 dark:text-white">{helper.end}</span>
-      of
-      <span class="font-semibold text-gray-900 dark:text-white">{helper.total}</span>
-      Entries
-    </div>
 
-    <Pagination table>
-      <span slot="prev">Prev</span>
-    </Pagination>
-  </div>
+  {#if sizeFilterItems != 0}
+    <div class="flex flex-col items-center justify-center gap-2 mt-4">
+      <Pagination {pages}>
+        <svelte:fragment slot="prev">
+          <ChevronLeftOutline class="w-2.5 h-2.5" />
+        </svelte:fragment>
+        <svelte:fragment slot="next">
+          <ChevronRightOutline class="w-2.5 h-2.5" />
+        </svelte:fragment>
+      </Pagination>
+    </div>
+  {/if}
 </section>

@@ -21,6 +21,8 @@
     "vite": "^4.4.5"
   },
   "dependencies": {
+    "gridjs": "^6.0.6",
+    "gridjs-svelte": "^2.1.1",
     "svelte-notifications": "^0.9.98",
     "svelte-qrcode-image": "^1.0.0-rc.2",
     "svelte-spa-router": "^3.3.0",
