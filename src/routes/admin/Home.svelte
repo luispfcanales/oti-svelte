@@ -2,6 +2,7 @@
   import Layout from './Layout.svelte';
   import StateSupport from '../../lib/StateSupport.svelte';
   import Ticket from '../../lib/Ticket.svelte';
+  import TableGrid from '../../lib/TableGrid.svelte';
 </script>
 
 <Layout>
@@ -13,6 +14,7 @@
       {/each}
     </section>
     <section>
+    <TableGrid/>
     </section>
   </svelte:fragment>
 </Layout>
