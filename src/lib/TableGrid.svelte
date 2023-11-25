@@ -23,24 +23,15 @@
     "staff",,
     "options",
   ]}
-  style={{
-    container:{
-      border:"1px solid orange",
-    },
-    table: {
-      border: '3px solid #ccc',
-      "background-color":'#fff',
-    },
-    th: {
-      'background-color': 'rgba(0, 0, 0, 0.1)',
-      color: '#000',
-      'border-bottom': '3px solid #ccc',
-      'text-align': 'center'
-    },
-    td: {
-      'text-align': 'center',
-      border: '1px solid #ccc',
+  className={
+    {
+      container:"flex flex-col",
+      table:"w-full text-sm text-left rtl:text-right text-gray-500",
+      thead:"text-xs text-gray-700 uppercase bg-gray-50",
+      th:"px-6 py-4 font-medium text-gray-900 whitespace-nowrap",
+      td:"px-4 py-2",
+      tr:"bg-white hover:bg-gray-50",
     }
-  }}
+  }
 ></Grid>
 

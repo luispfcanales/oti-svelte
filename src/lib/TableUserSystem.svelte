@@ -12,6 +12,7 @@
     DropdownItem,
 
     Pagination,
+    PaginationItem,
 
     Badge,
   } from 'flowbite-svelte';
@@ -25,36 +26,54 @@
   export let items = [];
   export let fnOpenModalDelete;
 
-  let pages = [];
+  //limitToRenderTable default limit 10
+  export let limitToRenderTable = 10 
 
   let searchDataTable = '';
-  let limitToRenderTable = 10
+
+  //pagination index init-end
+  let initRender = 0;
+  let endRender = limitToRenderTable;
+
+  //resize with change filteredItems
+  $: auxToRenderRows = limitToRenderTable
 
   //reactive search filter
   $: filteredItems = items.filter((item) => item.fullname.toLowerCase().indexOf(searchDataTable.toLowerCase()) !== -1);
   $: sizeFilterItems = filteredItems.length
 
   //reactive pagination
-  let pagSize
-  function getButtonPagination(index) {
-    let listPagination = []
-    for(let i=1;i<=index;i++){
-      listPagination.push({ name :`${i}`,active:false})
-    }
-    listPagination[0].active = true
-    return  listPagination
-  }
+  let paginationSize
   $:{
     if(sizeFilterItems > 0){
-      pagSize = filteredItems.length / limitToRenderTable;
-      pagSize = Math.ceil(pagSize);
-      pages = getButtonPagination(pagSize)
+      paginationSize = filteredItems.length / limitToRenderTable;
+      paginationSize = Math.ceil(paginationSize);
     }else{
-      pagSize = 0;
+      paginationSize = 0;
     }
-    console.log("debbug pagination: "+pagSize)
+    console.log("debbug pagination: "+paginationSize)
   }
 
+  //render size rows
+  $:{
+    if(sizeFilterItems < limitToRenderTable) {
+      auxToRenderRows = sizeFilterItems;
+    }else{
+      auxToRenderRows = limitToRenderTable;
+    }
+    console.log("debugg render rows: ",auxToRenderRows);
+  }
+
+  //HANDLERS PAGINATION
+  //handle Click
+  function handlePaginationOption(index){
+    endRender = limitToRenderTable * index;
+    initRender = endRender - limitToRenderTable;
+  }
+  //hadle active pagination efect
+  function activePagination(index){
+    return true
+  }
 </script>
 
 <section>
@@ -66,7 +85,6 @@
       divClass="mx-4 mt-5 shadow-md bg-rose-400 rounded-md"
     >
       <TableHead >
-        <TableHeadCell>Nro</TableHeadCell>
         <TableHeadCell>Dni</TableHeadCell>
         <TableHeadCell>Email</TableHeadCell>
         <TableHeadCell>Nombre</TableHeadCell>
@@ -76,31 +94,32 @@
         <TableHeadCell>Opciones</TableHeadCell>
       </TableHead>
       <TableBody>
-        {#each Array(sizeFilterItems) as _,index (index)}
-          <TableBodyRow>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{index+1}</TableBodyCell>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{filteredItems[index].dni}</TableBodyCell>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{filteredItems[index].email}</TableBodyCell>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{filteredItems[index].fullname}</TableBodyCell>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">
-              {#if filteredItems[index].state}
-                <Badge color={"green"}>Activo</Badge>
-              {:else}
-                <Badge color={"red"}>Inactivo</Badge>
-              {/if}
-            </TableBodyCell>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{filteredItems[index].role}</TableBodyCell>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{filteredItems[index].staff}</TableBodyCell>
-            <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap flex justify-center">
-              <DotsHorizontalOutline class="text-rose-400"/>
-              <Dropdown>
-                <DropdownItem>Editar</DropdownItem>
-                <DropdownItem on:click={()=>{fnOpenModalDelete(filteredItems[index].dni)}}>
-                  Eliminar
-                </DropdownItem>
-              </Dropdown>
-            </TableBodyCell>
-          </TableBodyRow>
+        {#each filteredItems as item,index (index)}
+          {#if index >= initRender && index < endRender }
+            <TableBodyRow>
+              <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{item.dni}</TableBodyCell>
+              <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{item.email}</TableBodyCell>
+              <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{item.fullname}</TableBodyCell>
+              <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">
+                {#if item.state}
+                  <Badge color={"green"}>Activo</Badge>
+                {:else}
+                  <Badge color={"red"}>Inactivo</Badge>
+                {/if}
+              </TableBodyCell>
+              <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{item.role}</TableBodyCell>
+              <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap">{item.staff}</TableBodyCell>
+              <TableBodyCell tdClass="px-3 py-2 whitespace-nowrap flex justify-center">
+                <DotsHorizontalOutline class="text-rose-400"/>
+                <Dropdown>
+                  <DropdownItem>Editar</DropdownItem>
+                  <DropdownItem on:click={()=>{fnOpenModalDelete(item.dni)}}>
+                    Eliminar
+                  </DropdownItem>
+                </Dropdown>
+              </TableBodyCell>
+            </TableBodyRow>
+          {/if}
         {/each}
       </TableBody>
 
@@ -116,15 +135,22 @@
   </Table>
 
   {#if sizeFilterItems != 0}
-    <div class="flex flex-col items-center justify-center gap-2 mt-4">
-      <Pagination {pages}>
-        <svelte:fragment slot="prev">
-          <ChevronLeftOutline class="w-2.5 h-2.5" />
-        </svelte:fragment>
-        <svelte:fragment slot="next">
-          <ChevronRightOutline class="w-2.5 h-2.5" />
-        </svelte:fragment>
-      </Pagination>
+    <div class="flex items-center justify-center mt-4">
+      <PaginationItem class="flex items-center rounded-none">
+        <ChevronLeftOutline class="w-2.5 h-2.5" />
+      </PaginationItem>
+      {#each Array(paginationSize) as _,index (index) }
+        <PaginationItem
+          active={activePagination(index)}
+          class="flex rounded-none items-center w-8"
+          on:click={()=>handlePaginationOption( index+1 )}
+        >
+          {index+1}
+        </PaginationItem>
+      {/each}
+      <PaginationItem class="flex rounded-none items-center">
+        <ChevronRightOutline class="w-2.5 h-2.5" />
+      </PaginationItem>
     </div>
   {/if}
 </section>

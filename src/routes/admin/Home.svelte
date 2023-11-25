@@ -2,7 +2,6 @@
   import Layout from './Layout.svelte';
   import StateSupport from '../../lib/StateSupport.svelte';
   import Ticket from '../../lib/Ticket.svelte';
-  import TableGrid from '../../lib/TableGrid.svelte';
 </script>
 
 <Layout>
@@ -12,9 +11,6 @@
       {#each Array(15) as _, index (index) }
         <Ticket></Ticket>
       {/each}
-    </section>
-    <section class="w-full overflow-x-auto">
-    <TableGrid/>
     </section>
   </svelte:fragment>
 </Layout>

@@ -6,7 +6,7 @@
   const prefix = '/admin'
   const routes = {
     '/':Home,
-    '/:routeAdmin':UserSystem,
+    '/usuarios':UserSystem,
   }
 </script>
 
