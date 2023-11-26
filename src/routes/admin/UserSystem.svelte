@@ -3,11 +3,16 @@
   import TableUserSystem from "../../lib/TableUserSystem.svelte";
   import fakedata from "../../lib/fakedata"
 
-  import { Modal,Button } from "flowbite-svelte";
-  import { ExclamationCircleOutline } from 'flowbite-svelte-icons';
+  import {
+    Modal,
+    Button,
+  } from "flowbite-svelte";
 
-  import { getNotificationsContext } from 'svelte-notifications';
-  const {addNotification } = getNotificationsContext()
+  import {
+    ExclamationCircleOutline,
+  } from 'flowbite-svelte-icons';
+
+  import {toast} from "svelte-sonner"
 
   //handle open and close modal
   let triggerModal = false;
@@ -19,12 +24,13 @@
 
   //handle Notification
   function fnShowNotification(){
-    addNotification({
-      text:`Usuario ${keyID} eliminado!`,
-      position:'top-center',
-      removeAfter: 4000,
-      type: 'success',
-    })
+    toast.success("Usuario eliminado!")
+    //addNotification({
+    //  text:`Usuario ${keyID} eliminado!`,
+    //  position:'top-center',
+    //  removeAfter: 4000,
+    //  type: 'success',
+    //})
   }
 </script>
 

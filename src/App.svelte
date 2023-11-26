@@ -1,9 +1,10 @@
 <script>
   import Router from "svelte-spa-router"
   import routes from "./routes";
-  import Notifications from 'svelte-notifications';
+  import {Toaster} from "svelte-sonner"
 </script>
 
-<Notifications>
-  <Router {routes}></Router>
-</Notifications>
+<Router {routes}></Router>
+<Toaster
+  position="top-right"
+/>

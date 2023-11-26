@@ -23,6 +23,7 @@
   "dependencies": {
     "svelte-notifications": "^0.9.98",
     "svelte-qrcode-image": "^1.0.0-rc.2",
+    "svelte-sonner": "^0.3.3",
     "svelte-spa-router": "^3.3.0",
     "uuid": "^9.0.1"
   }
