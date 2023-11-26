@@ -44,14 +44,25 @@
 
   //reactive pagination
   let paginationSize
+  let ListPagination = [];
+  let currentPagination = 1;
+  $: reactivePagination = ListPagination;
   $:{
+    ListPagination = []
     if(sizeFilterItems > 0){
       paginationSize = filteredItems.length / limitToRenderTable;
       paginationSize = Math.ceil(paginationSize);
+      //create new ListPagination with search word
+      for(let i=0;i<paginationSize;i++){
+        ListPagination.push({value:i+1,active:false})
+        //active current pagination
+        if(currentPagination-1 == i ){
+          ListPagination[i].active = true;
+        }
+      }
     }else{
       paginationSize = 0;
     }
-    console.log("debbug pagination: "+paginationSize)
   }
 
   //render size rows
@@ -61,18 +72,22 @@
     }else{
       auxToRenderRows = limitToRenderTable;
     }
-    console.log("debugg render rows: ",auxToRenderRows);
   }
 
   //HANDLERS PAGINATION
   //handle Click
-  function handlePaginationOption(index){
+  function handleRenderRowsByPagination(index){
     endRender = limitToRenderTable * index;
     initRender = endRender - limitToRenderTable;
+    currentPagination = index;
+    activePagination(index)
   }
   //hadle active pagination efect
   function activePagination(index){
-    return true
+    for(let i=0;i<paginationSize;i++){
+      reactivePagination[i].active = false;
+    }
+    reactivePagination[index-1].active = true;
   }
 </script>
 
@@ -139,13 +154,13 @@
       <PaginationItem class="flex items-center rounded-none">
         <ChevronLeftOutline class="w-2.5 h-2.5" />
       </PaginationItem>
-      {#each Array(paginationSize) as _,index (index) }
+      {#each reactivePagination as item,index (index) }
         <PaginationItem
-          active={activePagination(index)}
+          active={item.active}
           class="flex rounded-none items-center w-8"
-          on:click={()=>handlePaginationOption( index+1 )}
+          on:click={()=>handleRenderRowsByPagination( item.value )}
         >
-          {index+1}
+          {item.value}
         </PaginationItem>
       {/each}
       <PaginationItem class="flex rounded-none items-center">
